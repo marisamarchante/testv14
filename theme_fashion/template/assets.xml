@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<template id="jt_assets" name="Theme Assert" inherit_id="web.assets_frontend">
+		<xpath expr="//link[last()]" position="after">		    
+		  	<link rel="stylesheet" href="/theme_fashion/static/src/css/plugins/swiper-bundle.min.css"/>
+		    <link rel="stylesheet" href="/theme_fashion/static/src/css/plugins/glightbox.min.css"/>
+		    <link href="/theme_fashion/static/src/css/jt_font.css" rel="stylesheet"/>
+		    <link rel="stylesheet" href="/theme_fashion/static/src/css/style.css"/>
+		    <link rel="stylesheet" href="/theme_fashion/static/src/css/jt_custom.css"/>
+		</xpath>
+		<xpath expr="//script[last()]" position="after">
+			<script src="/theme_fashion/static/src/js/plugins/swiper-bundle.min.js"></script>
+			<script src="/theme_fashion/static/src/js/plugins/glightbox.min.js"></script>
+			<script src="/theme_fashion/static/src/js/script.js"></script>
+		</xpath>
+	</template>
+</odoo>

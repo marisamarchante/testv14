@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="jt_theme_fashion_layout" name="Fashion Theme Layout" inherit_id="portal.frontend_layout">
+        <xpath expr="//header" position="replace">
+            <header class="header__section">
+                <div class="header__topbar bg__secondary">
+                    <div class="container-fluid">
+                        <div class="header__topbar--inner d-flex align-items-center justify-content-between">
+                            <div class="header__shipping">
+                                <ul class="header__shipping--wrapper d-flex">
+                                    <li class="header__shipping--text text-white">Welcome to Fashion online Store</li>
+                                    <li class="header__shipping--text text-white d-sm-2-none jt_shipping_header"><img class="header__shipping--text__icon" src="/theme_fashion/static/src/img/icon/bus.png" alt="bus-icon"/> Track Your Order</li>
+                                    <li class="header__shipping--text text-white d-sm-2-none jt_shipping_header">
+                                        <img class="header__shipping--text__icon" src="/theme_fashion/static/src/img/icon/email.png" alt="email-icon"/> 
+                                        <a class="header__shipping--text__link" t-if="res_company.email" t-attf-href="mailto:{{res_company.email}}">
+                                            <t t-esc="res_company.email"/>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="language__currency d-none d-lg-block">
+                                <ul class="d-flex align-items-center">
+                                    <t t-set="active_lang" t-value="list(filter(lambda lg : lg[0] == lang, languages))[0]"/>
+                                    <t t-set="language_selector_visible" t-value="len(languages) &gt; 0"/>
+                                    <li class="language__currency--list">
+                                        <a class="language__switcher text-white" href="#">
+                                            <img class="language__switcher--icon__img jt_cuntry" t-attf-src="{{active_lang[4]}}"/>
+                                            <span t-if="not no_text"
+                                                t-esc="active_lang[2].split('/').pop()"/> 
+                                            <svg  width="11.797" height="9.05" viewBox="0 0 9.797 6.05">
+                                                <path  d="M14.646,8.59,10.9,12.329,7.151,8.59,6,9.741l4.9,4.9,4.9-4.9Z" transform="translate(-6 -8.59)" fill="currentColor" opacity="0.7"/>
+                                            </svg>
+                                        </a>
+                                        <div class="dropdown__language">
+                                            <ul>
+                                                <t t-foreach="languages" t-as="lg">
+                                                    <li class="language__items">
+                                                        <a class="language__text" t-att-href="url_for(request.httprequest.path + '?' + keep_query(), lang_code=lg[0])">
+                                                            <t
+                                                                t-esc="lg[2].split('/').pop()"/>
+                                                        </a>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <t t-set="website_sale_pricelists" t-value="website.get_pricelist_available(show_visible=True)" />
+                                    <div t-attf-class="language__currency--list dropdown#{'' if website_sale_pricelists and len(website_sale_pricelists)&gt;1 else ' d-none'} #{_classes}">
+                                        <t t-set="curr_pl" t-value="website.get_current_pricelist()" />
+                                        <a role="button" href="#" class="account__currency--link text-white" data-toggle="dropdown">
+                                            <span>
+                                                <t t-esc="curr_pl and curr_pl.name or ' - '" />
+                                            </span>
+                                            <svg  width="11.797" height="9.05" viewBox="0 0 9.797 6.05">
+                                                <path  d="M14.646,8.59,10.9,12.329,7.151,8.59,6,9.741l4.9,4.9,4.9-4.9Z" transform="translate(-6 -8.59)" fill="currentColor" opacity="0.7"/>
+                                            </svg>
+                                        </a>
+                                        <div class="dropdown-menu dropdown__currency" role="menu">
+                                            <t t-foreach="website_sale_pricelists" t-as="pl">
+                                                <li class="currency__items"><a role="menuitem" t-att-href="'/shop/change_pricelist/%s' % pl.id" class="currency__text dropdown-item"><span t-att-data-pl_id="pl.id" t-esc="pl.name" /></a></li>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main__header header__sticky">
+                    <div class="container-fluid">
+                        <div class="main__header--inner position__relative d-flex justify-content-between align-items-center">
+                            <div class="offcanvas__header--menu__open ">
+                                <a class="offcanvas__header--menu__open--btn" href="javascript:void(0)" data-offcanvas="">
+                                    <svg  class="ionicon offcanvas__header--menu__open--svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 160h352M80 256h352M80 352h352"/>
+                                    </svg>
+                                    <span class="visually-hidden">Menu Open</span>
+                                </a>
+                            </div>
+                            <div class="main__logo">
+                                <h1 class="main__logo--title"><a class="main__logo--link" href="/"><img class="main__logo--img" src="/theme_fashion/static/src/img/logo/nav-log.png" alt="logo-img"/></a></h1>
+                            </div>
+                            <div class="header__search--widget header__sticky--none d-none d-lg-block">
+                                <form class="d-flex header__search--form o_wsale_products_searchbar_form" action="/shop">
+                                    <div class="header__select--categories select">
+                                        <select class="header__select--inner" onchange="location = this.value;">
+                                            <t t-set="shop_categorys" t-value="request.env['product.public.category'].sudo().search([])"/>
+                                            <option t-attf-value="/shop">All Categories</option>
+                                            <t t-foreach="shop_categorys" t-as="category1">
+                                                <t t-if="category">
+                                                    <option t-if="category.id == category1.id" selected="selected" t-attf-value="/shop/category/#{slug(category1)}" t-esc="category1.name"/>
+                                                    <option t-if="category.id != category1.id" t-attf-value="/shop/category/#{slug(category1)}">
+                                                        <t t-esc="category1.name"/>
+                                                    </option>
+                                                </t>
+                                                <t t-if="not category">
+                                                    <option t-attf-value="/shop/category/#{slug(category1)}">
+                                                        <t t-esc="category1.name"/>
+                                                    </option>
+                                                </t>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div class="header__search--box">
+                                        <input type="search" name="search" class="search-query header__search--input oe_search_box" data-limit="5" data-display-description="true" data-display-price="true" data-display-image="true"  data-oe-id="3321" data-oe-field="arch" placeholder="Keyword here..." value="" autocomplete="off"/>
+                                        <button class="header__search--button bg__secondary text-white oe_search_button" type="submit" aria-label="search button">
+                                            <svg class="header__search--button__svg" width="27.51" height="26.443" viewBox="0 0 512 512">
+                                                <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"></path>
+                                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="header__account header__sticky--none">
+                                <ul class="d-flex">
+                                    <t t-set="wishcount" t-value="len(request.env['product.wishlist'].current())"/>
+                                    <li t-attf-class="o_wsale_my_wish header__account-items d-none d-lg-block">
+                                        <a class="header__account-btn" href="/shop/wishlist">
+                                            <svg  width="28.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M352.92 80C288 80 256 144 256 144s-32-64-96.92-64c-52.76 0-94.54 44.14-95.08 96.81-1.1 109.33 86.73 187.08 183 252.42a16 16 0 0018 0c96.26-65.34 184.09-143.09 183-252.42-.54-52.67-42.32-96.81-95.08-96.81z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"></path>
+                                            </svg>
+                                            <span class="header__account-btn__text"> Wish List</span>
+                                            <span class="items__count wishlist my_wish_quantity">
+                                                <t t-esc="wishcount"/>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <t t-set="website_sale_order" t-value="website.sale_get_order()" />
+                                    <li class="header__account-items d-none d-lg-block">
+                                        <a class="header__account-btn minicart__open--btn" href="javascript:void(0)" data-offcanvas="">
+                                            <svg  width="26.51" height="23.443" viewBox="0 0 14.706 13.534">
+                                                <g  transform="translate(0 0)">
+                                                    <g >
+                                                        <path  data-name="Path 16787" d="M4.738,472.271h7.814a.434.434,0,0,0,.414-.328l1.723-6.316a.466.466,0,0,0-.071-.4.424.424,0,0,0-.344-.179H3.745L3.437,463.6a.435.435,0,0,0-.421-.353H.431a.451.451,0,0,0,0,.9h2.24c.054.257,1.474,6.946,1.555,7.33a1.36,1.36,0,0,0-.779,1.242,1.326,1.326,0,0,0,1.293,1.354h7.812a.452.452,0,0,0,0-.9H4.74a.451.451,0,0,1,0-.9Zm8.966-6.317-1.477,5.414H5.085l-1.149-5.414Z" transform="translate(0 -463.248)" fill="currentColor"/>
+                                                        <path  data-name="Path 16788" d="M5.5,478.8a1.294,1.294,0,1,0,1.293-1.353A1.325,1.325,0,0,0,5.5,478.8Zm1.293-.451a.452.452,0,1,1-.431.451A.442.442,0,0,1,6.793,478.352Z" transform="translate(-1.191 -466.622)" fill="currentColor"/>
+                                                        <path  data-name="Path 16789" d="M13.273,478.8a1.294,1.294,0,1,0,1.293-1.353A1.325,1.325,0,0,0,13.273,478.8Zm1.293-.451a.452.452,0,1,1-.431.451A.442.442,0,0,1,14.566,478.352Z" transform="translate(-2.875 -466.622)" fill="currentColor"/>
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                            <span class="header__account-btn__text"> My cart</span>   
+                                            <span class="items__count">
+                                                <t t-esc="website_sale_order and website_sale_order.cart_quantity or '0'"/>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items" groups="base.group_portal">
+                                        <a class="header__account-btn" href="/my/home">
+                                            <svg   width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                            </svg>
+                                            <span class="header__account-btn__text">My Account</span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items" groups="base.group_user">
+                                        <a class="header__account-btn" href="/my/home">
+                                            <svg   width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                            </svg>
+                                            <span class="header__account-btn__text">My Account</span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items d-none d-lg-block" groups="base.group_public">
+                                        <a class="header__account-btn" t-attf-href="/web/login">
+                                            <svg   width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                            </svg>
+                                            <span class="header__account-btn__text">Login</span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items d-none d-lg-block" groups="base.group_portal">
+                                        <a class="header__account-btn" t-attf-href="/web/session/logout?redirect=/">
+                                            <svg   width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                            </svg>
+                                            <span class="header__account-btn__text">Logout</span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items d-none d-lg-block" groups="base.group_user">
+                                        <a class="header__account-btn" t-attf-href="/web/session/logout?redirect=/">
+                                            <svg   width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                            </svg>
+                                            <span class="header__account-btn__text">Logout</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="header__account header__account2 header__sticky--block">
+                                <ul class="d-flex">
+                                    <li class="header__account-items header__account2--items  header__account--search__items d-none d-lg-block">
+                                        <a class="header__account-btn search__open--btn" href="javascript:void(0)" data-offcanvas="">
+                                            <svg class="header__search--button__svg"  width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"/>
+                                            </svg>
+                                            <span class="visually-hidden">Search</span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items header__account2--items">
+                                        <a class="header__account-btn" href="#">
+                                            <svg   width="26.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                            </svg>
+                                            <span class="visually-hidden">My Account</span>
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items header__account2--items d-none d-lg-block">
+                                        <a class="header__account-btn" href="#">
+                                            <svg   width="28.51" height="23.443" viewBox="0 0 512 512">
+                                                <path d="M352.92 80C288 80 256 144 256 144s-32-64-96.92-64c-52.76 0-94.54 44.14-95.08 96.81-1.1 109.33 86.73 187.08 183 252.42a16 16 0 0018 0c96.26-65.34 184.09-143.09 183-252.42-.54-52.67-42.32-96.81-95.08-96.81z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"></path>
+                                            </svg>
+                                            <span class="items__count  wishlist style2">02</span> 
+                                        </a>
+                                    </li>
+                                    <li class="header__account-items header__account2--items">
+                                        <a class="header__account-btn minicart__open--btn" href="javascript:void(0)" data-offcanvas="">
+                                            <svg  width="26.51" height="23.443" viewBox="0 0 14.706 13.534">
+                                                <g  transform="translate(0 0)">
+                                                    <g >
+                                                        <path  data-name="Path 16787" d="M4.738,472.271h7.814a.434.434,0,0,0,.414-.328l1.723-6.316a.466.466,0,0,0-.071-.4.424.424,0,0,0-.344-.179H3.745L3.437,463.6a.435.435,0,0,0-.421-.353H.431a.451.451,0,0,0,0,.9h2.24c.054.257,1.474,6.946,1.555,7.33a1.36,1.36,0,0,0-.779,1.242,1.326,1.326,0,0,0,1.293,1.354h7.812a.452.452,0,0,0,0-.9H4.74a.451.451,0,0,1,0-.9Zm8.966-6.317-1.477,5.414H5.085l-1.149-5.414Z" transform="translate(0 -463.248)" fill="currentColor"/>
+                                                        <path  data-name="Path 16788" d="M5.5,478.8a1.294,1.294,0,1,0,1.293-1.353A1.325,1.325,0,0,0,5.5,478.8Zm1.293-.451a.452.452,0,1,1-.431.451A.442.442,0,0,1,6.793,478.352Z" transform="translate(-1.191 -466.622)" fill="currentColor"/>
+                                                        <path  data-name="Path 16789" d="M13.273,478.8a1.294,1.294,0,1,0,1.293-1.353A1.325,1.325,0,0,0,13.273,478.8Zm1.293-.451a.452.452,0,1,1-.431.451A.442.442,0,0,1,14.566,478.352Z" transform="translate(-2.875 -466.622)" fill="currentColor"/>
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                            <span class="items__count style2">02</span> 
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header__bottom">
+                    <div class="container-fluid">
+                        <div class="header__bottom--inner position__relative d-none d-lg-flex justify-content-between align-items-center">
+                            <div class="header__menu">
+                                <nav class="header__menu--navigation">
+                                    <ul class="d-flex">
+                                        <li class="header__menu--items">
+                                            <a class="header__menu--link" href="/">Home</a>
+                                        </li>
+                                        <li class="header__menu--items mega__menu--items">
+                                            <a class="header__menu--link" href="/shop">Shop </a>
+                                        </li>
+                                        <li class="header__menu--items">
+                                            <a class="header__menu--link" href="/aboutus">About US </a>  
+                                        </li>
+                                        <li class="header__menu--items">
+                                            <a class="header__menu--link" href="/blog">Blog</a>
+                                        </li>
+                                        <li class="header__menu--items">
+                                            <a class="header__menu--link" href="/portfolio">Portfolio</a>
+                                        </li>
+                                        <li class="header__menu--items">
+                                            <a class="header__menu--link" href="/contactus">Contact </a>  
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <p class="header__discount--text"><img class="header__discount--icon__img" src="/theme_fashion/static/src/img/icon/lamp.png" alt="lamp-img"/> Special up to 60% Off all item</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Start Offcanvas header menu -->
+                <div class="offcanvas-header">
+                    <div class="offcanvas__inner">
+                        <div class="offcanvas__logo">
+                            <a class="offcanvas__logo_link" href="/">
+                            <img src="/theme_fashion/static/src/img/logo/nav-log.png" alt="Grocee Logo" width="158" height="36"/>
+                            </a>
+                            <button class="offcanvas__close--btn" data-offcanvas="">close</button>
+                        </div>
+                        <nav class="offcanvas__menu">
+                            <ul class="offcanvas__menu_ul">
+                                <li class="offcanvas__menu_li">
+                                    <a class="offcanvas__menu_item" href="/">Home</a>
+                                </li>
+                                <li class="offcanvas__menu_li"><a class="offcanvas__menu_item" href="/shop">Shop</a></li>
+                                <li class="offcanvas__menu_li"><a class="offcanvas__menu_item" href="/aboutus">About Us</a></li>
+                                <li class="offcanvas__menu_li"><a class="offcanvas__menu_item" href="/blog">Blog</a></li>
+                                <li class="offcanvas__menu_li"><a class="offcanvas__menu_item" href="/portfolio">Portfolio</a></li>
+                                <li class="offcanvas__menu_li"><a class="offcanvas__menu_item" href="/contactus">Contact</a></li>
+                            </ul>
+                            <div class="offcanvas__account--items" groups="base.group_public">
+                                <a class="offcanvas__account--items__btn d-flex align-items-center" t-attf-href="/web/login">
+                                    <span class="offcanvas__account--items__icon" style="line-height: 2.8rem;">
+                                        <svg   width="20.51" height="19.443" viewBox="0 0 512 512">
+                                            <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                            <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                        </svg>
+                                    </span>
+                                    <span class="offcanvas__account--items__label">Login / Register</span>
+                                </a>
+                            </div>
+                            <div class="offcanvas__account--items" groups="base.group_portal">
+                                <a class="offcanvas__account--items__btn d-flex align-items-center" t-attf-href="/web/session/logout?redirect=/">
+                                    <span class="offcanvas__account--items__icon" style="line-height: 2.8rem;">
+                                        <svg   width="20.51" height="19.443" viewBox="0 0 512 512">
+                                            <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                            <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                        </svg>
+                                    </span>
+                                    <span class="offcanvas__account--items__label">Logout</span>
+                                </a>
+                            </div>
+                            <div class="offcanvas__account--items" groups="base.group_user">
+                                <a class="offcanvas__account--items__btn d-flex align-items-center" t-attf-href="/web/session/logout?redirect=/">
+                                    <span class="offcanvas__account--items__icon" style="line-height: 2.8rem;">
+                                        <svg   width="20.51" height="19.443" viewBox="0 0 512 512">
+                                            <path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                            <path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                        </svg>
+                                    </span>
+                                    <span class="offcanvas__account--items__label">Logout</span>
+                                </a>
+                            </div>
+                            <div class="language__currency">
+                                <ul class="d-flex align-items-center">
+                                    <t t-set="active_lang" t-value="list(filter(lambda lg : lg[0] == lang, languages))[0]"/>
+                                    <t t-set="language_selector_visible" t-value="len(languages) &gt; 0"/>
+                                    <li class="language__currency--list">
+                                        <a class="offcanvas__language--switcher" href="#">
+                                            <img class="language__switcher--icon__img jt_cuntry" t-attf-src="{{active_lang[4]}}"/>
+                                            <span t-if="not no_text"
+                                                t-esc="active_lang[2].split('/').pop()"/> 
+                                            <svg  width="11.797" height="9.05" viewBox="0 0 9.797 6.05">
+                                                <path  d="M14.646,8.59,10.9,12.329,7.151,8.59,6,9.741l4.9,4.9,4.9-4.9Z" transform="translate(-6 -8.59)" fill="currentColor" opacity="0.7"/>
+                                            </svg>
+                                        </a>
+                                        <div class="offcanvas__dropdown--language">
+                                            <ul>
+                                                <t t-foreach="languages" t-as="lg">
+                                                    <li class="language__items">
+                                                        <a class="language__text" t-att-href="url_for(request.httprequest.path + '?' + keep_query(), lang_code=lg[0])">
+                                                            <t
+                                                                t-esc="lg[2].split('/').pop()"/>
+                                                        </a>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <t t-set="website_sale_pricelists" t-value="website.get_pricelist_available(show_visible=True)" />
+                                    <li class="language__currency--list">
+                                        <t t-set="curr_pl" t-value="website.get_current_pricelist()" />
+                                        <a class="offcanvas__account--currency__menu" href="#">
+                                            <span><t t-esc="curr_pl and curr_pl.name or ' - '" /></span> 
+                                            <svg  width="11.797" height="9.05" viewBox="0 0 9.797 6.05">
+                                                <path  d="M14.646,8.59,10.9,12.329,7.151,8.59,6,9.741l4.9,4.9,4.9-4.9Z" transform="translate(-6 -8.59)" fill="currentColor" opacity="0.7"/>
+                                            </svg>
+                                        </a>
+                                        <div class="offcanvas__account--currency__submenu">
+                                            <ul>
+                                                <t t-foreach="website_sale_pricelists" t-as="pl">
+                                                    <li class="currency__items"><a class="currency__text" t-att-href="'/shop/change_pricelist/%s' % pl.id"><span t-att-data-pl_id="pl.id" t-esc="pl.name" /></a></li>
+                                                </t>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+                <!-- End Offcanvas header menu -->
+                <!-- Start Offcanvas stikcy toolbar -->
+                <div class="offcanvas__stikcy--toolbar">
+                    <ul class="d-flex justify-content-between">
+                        <li class="offcanvas__stikcy--toolbar__list">
+                            <a class="offcanvas__stikcy--toolbar__btn" href="/">
+                                <span class="offcanvas__stikcy--toolbar__icon" style="line-height: 2.8rem;">
+                                    <svg  fill="none" width="21.51" height="21.443" viewBox="0 0 22 17">
+                                        <path fill="currentColor" d="M20.9141 7.93359c.1406.11719.2109.26953.2109.45703 0 .14063-.0469.25782-.1406.35157l-.3516.42187c-.1172.14063-.2578.21094-.4219.21094-.1406 0-.2578-.04688-.3515-.14062l-.9844-.77344V15c0 .3047-.1172.5625-.3516.7734-.2109.2344-.4687.3516-.7734.3516h-4.5c-.3047 0-.5742-.1172-.8086-.3516-.2109-.2109-.3164-.4687-.3164-.7734v-3.6562h-2.25V15c0 .3047-.11719.5625-.35156.7734-.21094.2344-.46875.3516-.77344.3516h-4.5c-.30469 0-.57422-.1172-.80859-.3516-.21094-.2109-.31641-.4687-.31641-.7734V8.46094l-.94922.77344c-.11719.09374-.24609.14062-.38672.14062-.16406 0-.30468-.07031-.42187-.21094l-.35157-.42187C.921875 8.625.875 8.50781.875 8.39062c0-.1875.070312-.33984.21094-.45703L9.73438.832031C10.1094.527344 10.5312.375 11 .375s.8906.152344 1.2656.457031l8.6485 7.101559zm-3.7266 6.50391V7.05469L11 1.99219l-6.1875 5.0625v7.38281h3.375v-3.6563c0-.3046.10547-.5624.31641-.7734.23437-.23436.5039-.35155.80859-.35155h3.375c.3047 0 .5625.11719.7734.35155.2344.211.3516.4688.3516.7734v3.6563h3.375z"></path>
+                                    </svg>
+                                </span>
+                                <span class="offcanvas__stikcy--toolbar__label">Home</span>
+                            </a>
+                        </li>
+                        <li class="offcanvas__stikcy--toolbar__list">
+                            <a class="offcanvas__stikcy--toolbar__btn" href="/shop">
+                                <span class="offcanvas__stikcy--toolbar__icon" style="line-height: 2.8rem;">
+                                    <svg fill="currentColor"  width="18.51" height="17.443" viewBox="0 0 448 512">
+                                        <path d="M416 32H32A32 32 0 0 0 0 64v384a32 32 0 0 0 32 32h384a32 32 0 0 0 32-32V64a32 32 0 0 0-32-32zm-16 48v152H248V80zm-200 0v152H48V80zM48 432V280h152v152zm200 0V280h152v152z"></path>
+                                    </svg>
+                                </span>
+                                <span class="offcanvas__stikcy--toolbar__label">Shop</span>
+                            </a>
+                        </li>
+                        <li class="offcanvas__stikcy--toolbar__list ">
+                            <a class="offcanvas__stikcy--toolbar__btn search__open--btn" href="javascript:void(0)" data-offcanvas="">
+                                <span class="offcanvas__stikcy--toolbar__icon" style="line-height: 2.8rem;">
+                                    <svg   width="22.51" height="20.443" viewBox="0 0 512 512">
+                                        <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"/>
+                                    </svg>
+                                </span>
+                                <span class="offcanvas__stikcy--toolbar__label">Search</span>
+                            </a>
+                        </li>
+                        <t t-set="website_sale_order" t-value="website.sale_get_order()" />
+                        <li class="offcanvas__stikcy--toolbar__list">
+                            <a class="offcanvas__stikcy--toolbar__btn minicart__open--btn" href="javascript:void(0)" data-offcanvas="">
+                                <span class="offcanvas__stikcy--toolbar__icon" style="line-height: 2.8rem;">
+                                    <svg  width="18.51" height="15.443" viewBox="0 0 18.51 15.443">
+                                        <path  d="M79.963,138.379l-13.358,0-.56-1.927a.871.871,0,0,0-.6-.592l-1.961-.529a.91.91,0,0,0-.226-.03.864.864,0,0,0-.226,1.7l1.491.4,3.026,10.919a1.277,1.277,0,1,0,1.844,1.144.358.358,0,0,0,0-.049h6.163c0,.017,0,.034,0,.049a1.277,1.277,0,1,0,1.434-1.267c-1.531-.247-7.783-.55-7.783-.55l-.205-.8h7.8a.9.9,0,0,0,.863-.651l1.688-5.943h.62a.936.936,0,1,0,0-1.872Zm-9.934,6.474H68.568c-.04,0-.1.008-.125-.085-.034-.118-.082-.283-.082-.283l-1.146-4.037a.061.061,0,0,1,.011-.057.064.064,0,0,1,.053-.025h1.777a.064.064,0,0,1,.063.051l.969,4.34,0,.013a.058.058,0,0,1,0,.019A.063.063,0,0,1,70.03,144.853Zm3.731-4.41-.789,4.359a.066.066,0,0,1-.063.051h-1.1a.064.064,0,0,1-.063-.051l-.789-4.357a.064.064,0,0,1,.013-.055.07.07,0,0,1,.051-.025H73.7a.06.06,0,0,1,.051.025A.064.064,0,0,1,73.76,140.443Zm3.737,0L76.26,144.8a.068.068,0,0,1-.063.049H74.684a.063.063,0,0,1-.051-.025.064.064,0,0,1-.013-.055l.973-4.357a.066.066,0,0,1,.063-.051h1.777a.071.071,0,0,1,.053.025A.076.076,0,0,1,77.5,140.448Z" transform="translate(-62.393 -135.3)" fill="currentColor"/>
+                                    </svg>
+                                </span>
+                                <span class="offcanvas__stikcy--toolbar__label">Cart</span>
+                                <span class="items__count">
+                                    <t t-esc="website_sale_order and website_sale_order.cart_quantity or '0'"/>
+                                </span>
+                            </a>
+                        </li>
+                        <t t-set="wishcount" t-value="len(request.env['product.wishlist'].current())"/>
+                        <li class="offcanvas__stikcy--toolbar__list">
+                            <a class="offcanvas__stikcy--toolbar__btn" href="shop/wishlist">
+                                <span class="offcanvas__stikcy--toolbar__icon" style="line-height: 2.8rem;">
+                                    <svg  width="18.541" height="15.557" viewBox="0 0 18.541 15.557">
+                                        <path  d="M71.775,135.51a5.153,5.153,0,0,1,1.267-1.524,4.986,4.986,0,0,1,6.584.358,4.728,4.728,0,0,1,1.174,4.914,10.458,10.458,0,0,1-2.132,3.808,22.591,22.591,0,0,1-5.4,4.558c-.445.282-.9.549-1.356.812a.306.306,0,0,1-.254.013,25.491,25.491,0,0,1-6.279-4.8,11.648,11.648,0,0,1-2.52-4.009,4.957,4.957,0,0,1,.028-3.787,4.629,4.629,0,0,1,3.744-2.863,4.782,4.782,0,0,1,5.086,2.447c.013.019.025.034.057.076Z" transform="translate(-62.498 -132.915)" fill="currentColor"/>
+                                    </svg>
+                                </span>
+                                <span class="offcanvas__stikcy--toolbar__label">Wishlist</span>
+                                <span class="items__count">
+                                    <t t-esc="wishcount"/>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End Offcanvas stikcy toolbar -->
+                <!-- Start offCanvas minicart -->
+                <div class="offCanvas__minicart">
+                    <div class="minicart__header ">
+                        <div class="minicart__header--top d-flex justify-content-between align-items-center">
+                            <h2 class="minicart__title h3"> Shopping Cart</h2>
+                            <button class="minicart__close--btn" aria-label="minicart close button" data-offcanvas="">
+                                <svg class="minicart__close--icon"   viewBox="0 0 512 512">
+                                    <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="minicart__header--desc">Clothing and fashion products are limited</p>
+                    </div>
+                    <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+                    <t t-foreach="website_sale_order.website_order_line" t-as="line">
+                        <div class="minicart__product">
+                            <div class="minicart__product--items d-flex">
+                                <div class="minicart__thumb">
+                                    <a t-att-href="line.product_id.website_url">
+                                    <span t-field="line.product_id.image_128" t-options="{'widget': 'image', 'qweb_img_responsive': False, 'class': 'rounded o_image_64_max'}" />
+                                    </a>
+                                </div>
+                                <div class="minicart__text">
+                                    <h3 class="minicart__subtitle h4">
+                                        <a href="#" t-if="line.product_id.name">
+                                            <t t-esc="line.product_id.name"/>
+                                        </a>
+                                    </h3>
+                                    <div class="minicart__price">
+                                        <span class="current__price">
+                                            <t t-esc="line.price_reduce_taxexcl"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <div class="minicart__amount">
+                        <div class="minicart__amount_list d-flex justify-content-between">
+                            <span>Sub Total:</span>
+                            <span><b t-field="website_sale_order.amount_untaxed" class="monetary_field" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/></span>
+                        </div>
+                        <div class="minicart__amount_list d-flex justify-content-between">
+                            <span>Tax:</span>
+                            <span t-field="website_sale_order.amount_tax" class="monetary_field" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}" />
+                        </div>
+                        <div class="minicart__amount_list d-flex justify-content-between">
+                            <span>Total:</span>
+                            <span><b t-field="website_sale_order.amount_total" class="monetary_field"
+                                t-options='{"widget": "monetary", "display_currency": website_sale_order.pricelist_id.currency_id}'/></span>
+                        </div>
+                    </div>
+                    <div class="minicart__button d-flex justify-content-center">
+                        <a class="primary__btn minicart__button--link" href="/shop/cart">View cart</a>
+                        <a class="primary__btn minicart__button--link" href="/shop/checkout?express=1">Checkout</a>
+                    </div>
+                </div>
+                <!-- End offCanvas minicart -->
+                <!-- Start serch box area -->
+                <div class="predictive__search--box ">
+                    <div class="predictive__search--box__inner">
+                        <h2 class="predictive__search--title">Search Products</h2>
+                        <form class="predictive__search-form o_wsale_products_searchbar_form" action="/shop">
+                            <label style="display: block;">
+                            <input type="search" name="search" class="search-query predictive__search-input oe_search_box" data-limit="5" data-display-description="true" data-display-price="true" data-display-image="true"  data-oe-id="3321" data-oe-field="arch" placeholder="Search Here" value="" autocomplete="off"/>
+                            </label>
+                            <button class="predictive__search-button oe_search_button" aria-label="search button" type="submit">
+                                <svg class="header__search--button__svg"  width="30.51" height="25.443" viewBox="0 0 512 512">
+                                    <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    <button class="predictive__search-close__btn" aria-label="search close button" data-offcanvas="">
+                        <svg class="predictive__search-close__icon"  width="40.51" height="30.443"  viewBox="0 0 512 512">
+                            <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/>
+                        </svg>
+                    </button>
+                </div>
+                <!-- End serch box area -->
+            </header>
+        </xpath>
+        <xpath expr="//footer" position="replace">
+            <footer class="footer__section bg__black">
+                <div class="container-fluid">
+                    <div class="main__footer d-flex justify-content-between">
+                        <div class="footer__widget footer__widget--width">
+                            <h2 class="footer__widget-title text-ofwhite h3 mb-4">About Us</h2>
+                            <div class="footer__widget--inner">
+                                <p class="footer__widget--desc text-ofwhite mb-20">Lorem ipsum dolor sit amet, consectetur adipisici ti elit <br/> seddo eiusmod tempor incididunt utlabore et dolore <br/> magna aliqua  enim ad minim veniam quisnostrud <br/> exercitation ullamco</p>
+                                <div class="footer__social">
+                                    <h3 class="social__title text-ofwhite h4 mb-15">Follow Us</h3>
+                                    <ul class="social__shear d-flex">
+                                        <li class="social__shear--list">
+                                            <a class="social__shear--list__icon" target="_blank" t-if="res_company.social_facebook" t-att-href="res_company.social_facebook">
+                                                <svg   width="7.667" height="16.524" viewBox="0 0 7.667 16.524">
+                                                    <path  data-name="Path 237" d="M967.495,353.678h-2.3v8.253h-3.437v-8.253H960.13V350.77h1.624v-1.888a4.087,4.087,0,0,1,.264-1.492,2.9,2.9,0,0,1,1.039-1.379,3.626,3.626,0,0,1,2.153-.6l2.549.019v2.833h-1.851a.732.732,0,0,0-.472.151.8.8,0,0,0-.246.642v1.719H967.8Z" transform="translate(-960.13 -345.407)" fill="currentColor"/>
+                                                </svg>
+                                                <span class="visually-hidden">Facebook</span>
+                                            </a>
+                                        </li>
+                                        <li class="social__shear--list">
+                                            <a class="social__shear--list__icon" target="_blank" t-if="res_company.social_twitter" t-att-href="res_company.social_twitter">
+                                                <svg   width="16.489" height="13.384" viewBox="0 0 16.489 13.384">
+                                                    <path  data-name="Path 303" d="M966.025,1144.2v.433a9.783,9.783,0,0,1-.621,3.388,10.1,10.1,0,0,1-1.845,3.087,9.153,9.153,0,0,1-3.012,2.259,9.825,9.825,0,0,1-4.122.866,9.632,9.632,0,0,1-2.748-.4,9.346,9.346,0,0,1-2.447-1.11q.4.038.809.038a6.723,6.723,0,0,0,2.24-.376,7.022,7.022,0,0,0,1.958-1.054,3.379,3.379,0,0,1-1.958-.687,3.259,3.259,0,0,1-1.186-1.666,3.364,3.364,0,0,0,.621.056,3.488,3.488,0,0,0,.885-.113,3.267,3.267,0,0,1-1.374-.631,3.356,3.356,0,0,1-.969-1.186,3.524,3.524,0,0,1-.367-1.5v-.057a3.172,3.172,0,0,0,1.544.433,3.407,3.407,0,0,1-1.1-1.214,3.308,3.308,0,0,1-.4-1.609,3.362,3.362,0,0,1,.452-1.694,9.652,9.652,0,0,0,6.964,3.538,3.911,3.911,0,0,1-.075-.772,3.293,3.293,0,0,1,.452-1.694,3.409,3.409,0,0,1,1.233-1.233,3.257,3.257,0,0,1,1.685-.461,3.351,3.351,0,0,1,2.466,1.073,6.572,6.572,0,0,0,2.146-.828,3.272,3.272,0,0,1-.574,1.083,3.477,3.477,0,0,1-.913.8,6.869,6.869,0,0,0,1.958-.546A7.074,7.074,0,0,1,966.025,1144.2Z" transform="translate(-951.23 -1140.849)" fill="currentColor"/>
+                                                </svg>
+                                                <span class="visually-hidden">Twitter</span>
+                                            </a>
+                                        </li>
+                                        <li class="social__shear--list">
+                                            <a class="social__shear--list__icon" target="_blank" t-if="res_company.social_instagram" t-att-href="res_company.social_instagram">
+                                                <svg  width="16.497" height="16.492" viewBox="0 0 19.497 19.492">
+                                                    <path  data-name="Icon awesome-instagram" d="M9.747,6.24a5,5,0,1,0,5,5A4.99,4.99,0,0,0,9.747,6.24Zm0,8.247A3.249,3.249,0,1,1,13,11.238a3.255,3.255,0,0,1-3.249,3.249Zm6.368-8.451A1.166,1.166,0,1,1,14.949,4.87,1.163,1.163,0,0,1,16.115,6.036Zm3.31,1.183A5.769,5.769,0,0,0,17.85,3.135,5.807,5.807,0,0,0,13.766,1.56c-1.609-.091-6.433-.091-8.042,0A5.8,5.8,0,0,0,1.64,3.13,5.788,5.788,0,0,0,.065,7.215c-.091,1.609-.091,6.433,0,8.042A5.769,5.769,0,0,0,1.64,19.341a5.814,5.814,0,0,0,4.084,1.575c1.609.091,6.433.091,8.042,0a5.769,5.769,0,0,0,4.084-1.575,5.807,5.807,0,0,0,1.575-4.084c.091-1.609.091-6.429,0-8.038Zm-2.079,9.765a3.289,3.289,0,0,1-1.853,1.853c-1.283.509-4.328.391-5.746.391S5.28,19.341,4,18.837a3.289,3.289,0,0,1-1.853-1.853c-.509-1.283-.391-4.328-.391-5.746s-.113-4.467.391-5.746A3.289,3.289,0,0,1,4,3.639c1.283-.509,4.328-.391,5.746-.391s4.467-.113,5.746.391a3.289,3.289,0,0,1,1.853,1.853c.509,1.283.391,4.328.391,5.746S17.855,15.705,17.346,16.984Z" transform="translate(0.004 -1.492)" fill="currentColor"/>
+                                                </svg>
+                                                <span class="visually-hidden">Instagram</span>
+                                            </a>
+                                        </li>
+                                        <li class="social__shear--list">
+                                            <a class="social__shear--list__icon" target="_blank" t-if="res_company.social_youtube" t-att-href="res_company.social_youtube">
+                                                <svg   width="16.49" height="11.582" viewBox="0 0 16.49 11.582">
+                                                    <path  data-name="Path 321" d="M967.759,1365.592q0,1.377-.019,1.717-.076,1.114-.151,1.622a3.981,3.981,0,0,1-.245.925,1.847,1.847,0,0,1-.453.717,2.171,2.171,0,0,1-1.151.6q-3.585.265-7.641.189-2.377-.038-3.387-.085a11.337,11.337,0,0,1-1.5-.142,2.206,2.206,0,0,1-1.113-.585,2.562,2.562,0,0,1-.528-1.037,3.523,3.523,0,0,1-.141-.585c-.032-.2-.06-.5-.085-.906a38.894,38.894,0,0,1,0-4.867l.113-.925a4.382,4.382,0,0,1,.208-.906,2.069,2.069,0,0,1,.491-.755,2.409,2.409,0,0,1,1.113-.566,19.2,19.2,0,0,1,2.292-.151q1.82-.056,3.953-.056t3.952.066q1.821.067,2.311.142a2.3,2.3,0,0,1,.726.283,1.865,1.865,0,0,1,.557.49,3.425,3.425,0,0,1,.434,1.019,5.72,5.72,0,0,1,.189,1.075q0,.095.057,1C967.752,1364.1,967.759,1364.677,967.759,1365.592Zm-7.6.925q1.49-.754,2.113-1.094l-4.434-2.339v4.66Q958.609,1367.311,960.156,1366.517Z" transform="translate(-951.269 -1359.8)" fill="currentColor"/>
+                                                </svg>
+                                                <span class="visually-hidden">Youtube</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer__widget--menu__wrapper d-flex footer__widget--width">
+                            <div class="footer__widget">
+                                <h2 class="footer__widget-title text-ofwhite h3 mt-4 mb-2">My Account</h2>
+                                <ul class="footer__widget--menu footer__widget--inner">
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/my/home">My Account</a></li>
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/shop/cart">Shopping Cart</a></li>
+                                    <li class="footer__widget--menu__list" groups="base.group_public"><a class="footer__widget--menu__text"  t-attf-href="/web/login">Login</a></li>
+                                    <li class="footer__widget--menu__list" groups="base.group_public"><a class="footer__widget--menu__text" href="/web/signup">Register</a></li>
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/shop/wishlist">Wishlist</a></li>
+                                </ul>
+                            </div>
+                            <div class="footer__widget">
+                                <h2 class="footer__widget-title text-ofwhite h3 mb-4">Categories</h2>
+                                <ul class="footer__widget--menu footer__widget--inner">
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/aboutus">About Us</a></li>
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/contactus">Contact Us</a></li>
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/portfolio">Portfolio</a></li>
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/privacy-policy">Privacy Policy</a></li>
+                                    <li class="footer__widget--menu__list"><a class="footer__widget--menu__text" href="/FAQ">Frequently</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="footer__widget footer__widget--width">
+                            <h2 class="footer__widget-title text-ofwhite h3 mb-4">Instagram</h2>
+                            <div class="footer__instagram footer__widget--inner">
+                                <div class="footer__instagram--list d-flex">
+                                    <div class="instagram__thumbnail">
+                                        <a class="instagram__thumbnail--img" target="_blank" href="#"><img src="/theme_fashion/static/src/img/other/instagram1.webp" alt="instagram"/></a>
+                                    </div>
+                                    <div class="instagram__thumbnail">
+                                        <a class="instagram__thumbnail--img" target="_blank" href="#"><img src="/theme_fashion/static/src/img/other/instagram2.webp" alt="instagram"/></a>
+                                    </div>
+                                    <div class="instagram__thumbnail">
+                                        <a class="instagram__thumbnail--img" target="_blank" href="#"><img src="/theme_fashion/static/src/img/other/instagram3.webp" alt="instagram"/></a>
+                                    </div>
+                                </div>
+                                <div class="footer__instagram--list d-flex">
+                                    <div class="instagram__thumbnail">
+                                        <a class="instagram__thumbnail--img" target="_blank" href="#"><img src="/theme_fashion/static/src/img/other/instagram4.webp" alt="instagram"/></a>
+                                    </div>
+                                    <div class="instagram__thumbnail">
+                                        <a class="instagram__thumbnail--img" target="_blank" href="#"><img src="/theme_fashion/static/src/img/other/instagram5.webp" alt="instagram"/></a>
+                                    </div>
+                                    <div class="instagram__thumbnail">
+                                        <a class="instagram__thumbnail--img" target="_blank" href="#"><img src="/theme_fashion/static/src/img/other/instagram6.webp" alt="instagram"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer__widget footer__widget--width">
+                            <h2 class="footer__widget-title text-ofwhite h3 mt-4">Newsletter</h2>
+                            <div class="footer__widget--inner">
+                                <p class="footer__widget--desc text-ofwhite m-0">Fill their seed open meat. Sea you <br/> great Saw image stl</p>
+                                <div class="newsletter__subscribe s_newsletter_subscribe_form js_subscribe" data-vxml="001" data-list-id="1">
+                                    <form id="mailchimp" class="newsletter__subscribe-form">
+                                        <input type="email" name="email" class="js_subscribe_email newsletter__subscribe-input" placeholder="your email..."/>
+                                        <button role="button" href="#" class="js_subscribe_btn o_submit ht_subcribe o_submit newsletter__subscribe-button">Subscribe</button>
+                                        <button role="button" href="#" class="btn-success js_subscribed_btn d-none o_submit newsletter__subscribe-button" disabled="disabled">Done</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer__bottom d-flex justify-content-between align-items-center">
+                        <p class="copyright__content text-ofwhite m-0">
+                            Copyright © 2022 <a class="copyright__content--link" href="/">Fashion</a> . All Rights Reserved.Design By 
+                            <t t-esc="res_company.name"/>
+                        </p>
+                        <div class="footer__payment text-right">
+                            <img class="display-block" src="/theme_fashion/static/src/img/other/payment-visa-card.png" alt="visa-card"/>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </xpath>
+    </template>
+</odoo>
